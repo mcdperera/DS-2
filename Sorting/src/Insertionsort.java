@@ -16,26 +16,19 @@ public class Insertionsort implements Sort<Line> {
      * @param comparatorType
      */
     @Override
-    public void sortList(long startTime, List<Line> records, ComparatorType comparatorType) {
+    public void sortList(List<Line> records, ComparatorType comparatorType) {
         int j;
         Line key;
         int i;
 
-        for (j = 1; j < records.size(); j++) {
+       for (j = 1; j < records.size(); j++) {
 
             key = records.get(j);
 
             for (i = j - 1; (i >= 0) && CustomComparator.compare(comparatorType, key, records.get(i)) < 0; i--) {
 
-                Line line = records.get(i);
-                long totalTime = (System.nanoTime() - startTime) ;
-                line.setTime(totalTime);
-
-                records.set(i + 1, line);
+                  records.set(i + 1,  records.get(i));
             }
-
-            long totalTime = (System.nanoTime() - startTime);
-            key.setTime(totalTime);
             
             records.set(i + 1, key);
         }

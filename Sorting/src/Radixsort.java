@@ -15,17 +15,13 @@ public class Radixsort implements Sort<Line> {
 
     private static int extendASCIIAlphabetSize = 256;
 
-    private long startTime = 0;
-
     /**
      *
      * @param lines
      * @param comparatorType
      */
     @Override
-    public void sortList(long startTime, List<Line> lines, ComparatorType comparatorType) {
-
-        this.startTime = startTime;
+    public void sortList(List<Line> lines, ComparatorType comparatorType) {
 
         int n = lines.size();
 
@@ -65,10 +61,6 @@ public class Radixsort implements Sort<Line> {
 
                 Line line = lines.get(i);
                 String s = (CustomComparator.getComparator(comparatorType, line));
-
-                long totalTime = (System.nanoTime() - this.startTime) / 1000000;
-
-                line.setTime(totalTime);
 
                 if (s.length() > d) {
                     int index = count[s.charAt(d)]++;

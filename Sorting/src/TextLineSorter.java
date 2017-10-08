@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -43,19 +45,27 @@ public class TextLineSorter {
             boolean isNeedPerformanceData,
             String performanceOutputFile) throws FileNotFoundException, IOException {
 
+        LinkedHashMap<Integer, Long> timeData = new LinkedHashMap<Integer, Long>() {
+        };
+
         List<Line> unsortedRecords = readUnSortedFile(inputFileName);
 
         List<Line> sortedRecords = null;
 
         List<Line> unsortedSublist = new ArrayList<>();
 
-        long startTime = System.nanoTime();
-
         for (int i = 0; i < NumberOfRecords; ++i) {
+
+            long startTime = System.nanoTime();
 
             unsortedSublist.add(unsortedRecords.get(i));
 
-            sorter.sortList(startTime, unsortedSublist, comparatorType);
+            sorter.sortList(unsortedSublist, comparatorType);
+
+            long endTime = System.nanoTime();
+            long totalTime = (endTime - startTime) / 1000;
+
+            timeData.put((i + 1), totalTime);
 
             if ((i + 1) == NumberOfRecords) {
                 sortedRecords = new ArrayList<>(unsortedSublist);
@@ -65,7 +75,7 @@ public class TextLineSorter {
         writeSortedFile(outputFileName, sortedRecords);
 
         if (isNeedPerformanceData) {
-            writePerformanceData(performanceOutputFile, sortedRecords);
+            writePerformanceData(performanceOutputFile, timeData);
         }
 
     }
@@ -103,15 +113,25 @@ public class TextLineSorter {
             sortedPartitions.add(emptylist);
         }
 
-        long startTime = System.nanoTime();
+        LinkedHashMap<Integer, Long> timeData = new LinkedHashMap<Integer, Long>() {
+        };
 
         for (int p = 0; p < partitions.size(); p++) {
 
             for (int i = 0; i < partitionSize; ++i) {
 
+                long startTime = System.nanoTime();
+
                 unsortedSublist.add(partitions.get(p).get(i));
 
-                sorter.sortList(startTime, unsortedSublist, comparatorType);
+                sorter.sortList(unsortedSublist, comparatorType);
+
+                long endTime = System.nanoTime();
+                long totalTime = (endTime - startTime) / 1000;
+                
+                int row = (p * 25) + i + 1;
+                
+                timeData.put(row, totalTime);
 
                 if ((i + 1) == partitionSize) {
 
@@ -129,17 +149,21 @@ public class TextLineSorter {
 
         Mergesort = new Mergesort();
 
-        Mergesort.merge(startTime, partallySortedPartitions1, sortedPartitions.get(0), sortedPartitions.get(1), comparatorType);
-        Mergesort.merge(startTime, partallySortedPartitions2, sortedPartitions.get(2), sortedPartitions.get(3), comparatorType);
+        Mergesort.merge(partallySortedPartitions1, sortedPartitions.get(0),
+                sortedPartitions.get(1), comparatorType);
+
+        Mergesort.merge(partallySortedPartitions2, sortedPartitions.get(2),
+                sortedPartitions.get(3), comparatorType);
 
         List<Line> fullySortedPartitions = new ArrayList<>();
 
-        Mergesort.merge(startTime, fullySortedPartitions, partallySortedPartitions1, partallySortedPartitions2, comparatorType);
+        Mergesort.merge(fullySortedPartitions, partallySortedPartitions1,
+                partallySortedPartitions2, comparatorType);
 
         writeSortedFile(outputFileName, fullySortedPartitions);
 
         if (isNeedPerformanceData) {
-            writePerformanceData(performanceOutputFile, fullySortedPartitions);
+            writePerformanceData(performanceOutputFile, timeData);
         }
 
     }
@@ -207,37 +231,18 @@ public class TextLineSorter {
 
     }
 
-    private static void writePerformanceData(String fileName, List<Line> list) throws IOException {
+    private static void writePerformanceData(String fileName, LinkedHashMap<Integer, Long> list) throws IOException {
 
-        // create the file.
-        File outFile = new File(fileName);
+        BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));
+        long value = 0;
+        for (Map.Entry<Integer, Long> entry : list.entrySet()) {
+            value += entry.getValue();
 
-        // check the existence of the file.
-        if (!outFile.exists()) {
-            outFile.createNewFile();
+            bw.write(String.format("%6s\t%s\n", entry.getKey(), value));
         }
-
-        BufferedWriter bw = new BufferedWriter(new FileWriter(outFile));
-
-        bw.write(String.format("%d%n", NumberOfRecords));
-
-        Collections.sort(list, new Comparator<Line>() {
-            @Override
-            public int compare(Line lhs, Line rhs) {
-                return Integer.signum(lhs.getId() - rhs.getId());
-            }
-        });
-
-        long time = 0;
-        for (Line r : list) {
-
-            time += r.time;
-            bw.write(r.id + "\t" + time+ "\n");
-        }
-
         try {
             bw.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("Failed to close buffered writer");
         }
 

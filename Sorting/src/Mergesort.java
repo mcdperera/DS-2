@@ -9,9 +9,8 @@ import java.util.List;
  */
 public class Mergesort implements Sort<Line> {
 
-
     @Override
-    public void sortList(long startTime, List<Line> names, ComparatorType comparatorType) {
+    public void sortList(List<Line> names, ComparatorType comparatorType) {
 
         if (names.size() >= 2) {
             List<Line> left = new ArrayList<>(names.size() / 2);
@@ -25,14 +24,14 @@ public class Mergesort implements Sort<Line> {
                 right.set(i, names.get(i + names.size() / 2));
             }
 
-            sortList(startTime, left, comparatorType);
-            sortList(startTime, right, comparatorType);
+            sortList(left, comparatorType);
+            sortList(right, comparatorType);
 
-            merge(startTime, names, left, right, comparatorType);
+            merge(names, left, right, comparatorType);
         }
     }
 
-    public void merge(long startTime, List<Line> names, List<Line> left, List<Line> right, ComparatorType comparatorType) {
+    public void merge(List<Line> names, List<Line> left, List<Line> right, ComparatorType comparatorType) {
         int a = 0;
         int b = 0;
 
@@ -44,14 +43,10 @@ public class Mergesort implements Sort<Line> {
 
             if (b >= right.size() || (a < left.size() && CustomComparator.compare(comparatorType, left.get(a), right.get(b)) < 0)) {
 
-                Line lineA = left.get(a);
-                lineA.setTime((System.nanoTime() - startTime) / 1000000);
-                names.set(i, lineA);
+                names.set(i, left.get(a));
                 a++;
             } else {
-                Line lineB = right.get(b);
-                lineB.setTime((System.nanoTime() - startTime) / 1000000);
-                names.set(i, lineB);
+                names.set(i, right.get(b));
                 b++;
             }
         }

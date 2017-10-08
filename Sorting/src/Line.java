@@ -88,8 +88,6 @@ public class Line {
         String commanSeperator = "|";
 
         return new StringBuilder()
-                //                .append(this.id)
-                //                .append(commanSeperator)
                 .append(this.lastName).append(" ").append(this.firstName)
                 .append(commanSeperator)
                 .append(this.address)
@@ -99,9 +97,6 @@ public class Line {
                 .append(this.state)
                 .append(commanSeperator)
                 .append(this.zipcode).toString();
-//                .append(commanSeperator)
-//                .append(this.time).toString();
-
     }
 
     public void setTime(long time) {
@@ -109,7 +104,7 @@ public class Line {
     }
 
     public long getTime() {
-        return this.time;
+        return this.time / 100000000;
     }
 
     public int getId() {

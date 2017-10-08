@@ -10,17 +10,13 @@ import java.util.List;
  */
 public class Quicksort implements Sort<Line> {
 
-    private long startTime = 0;
-
     /**
      *
      * @param records
      * @param comparatorType
      */
     @Override
-    public void sortList(long startTime, List<Line> records, ComparatorType comparatorType) {
-        this.startTime = startTime;
-
+    public void sortList(List<Line> records, ComparatorType comparatorType) {
         sortList(records, comparatorType, 0, records.size() - 1);
     }
 
@@ -62,19 +58,9 @@ public class Quicksort implements Sort<Line> {
     }
 
     private void swap(List<Line> records, int a, int b) {
-        Line lineA = records.get(a);
-        long totalTime = (System.nanoTime() - this.startTime) / 1000000;
-
-        lineA.setTime(totalTime);
-
-        Line temp = lineA;
-
-        Line lineB = records.get(b);
-        lineB.setTime((System.nanoTime() - this.startTime) / 1000000);
-        records.set(a, lineB);
-
+        Line temp = records.get(a);
+        records.set(a, records.get(b));
         records.set(b, temp);
-
     }
 
 }

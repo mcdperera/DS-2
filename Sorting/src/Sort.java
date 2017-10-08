@@ -18,6 +18,6 @@ public interface Sort<T> {
      * @param lines1
      * @param comparatorType
      */
-    void sortList(long startTime, List<T> lines1, ComparatorType comparatorType);
+    void sortList(List<T> lines1, ComparatorType comparatorType);
 
 }

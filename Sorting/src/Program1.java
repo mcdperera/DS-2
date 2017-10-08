@@ -14,8 +14,8 @@ public class Program1 {
      */
     public static void main(String... args) throws Exception {
 
-        boolean isMixedAlgorithm = false;
-        int sortType = 1;
+        boolean isMixedAlgorithm = true;
+        int sortType = 3;
 
 //        if (args.length != 3) {
 //            System.out.println("Invalid Usage -- please supply a filename as an argument");
