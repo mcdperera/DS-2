@@ -129,7 +129,7 @@ public class TextLineSorter {
                 long endTime = System.nanoTime();
                 long totalTime = (endTime - startTime) / 1000;
                 
-                int row = (p * 25) + i + 1;
+                int row = (p * partitionSize) + i + 1;
                 
                 timeData.put(row, totalTime);
 
